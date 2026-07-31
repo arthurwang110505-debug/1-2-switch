@@ -1,0 +1,6 @@
+{
+  "name": "1-2-Switch Party Game",
+  "description": "A web-based 1-2-Switch party game platform with Host TV display and Mobile Joy-Con motion controllers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
