@@ -92,6 +92,7 @@ function AppContent() {
     if (!socket) return;
 
     socket.on('game-state-update', (updatedRoom: Room) => {
+      console.log('[Socket] game-state-update received, new gameState:', updatedRoom.gameState);
       setRoom(updatedRoom);
     });
 
@@ -102,9 +103,11 @@ function AppContent() {
 
   // 大螢幕 Host 選擇：自動發起建立新房間
   const handleSelectHost = () => {
+    console.log('[App] handleSelectHost called');
     if (!socket) return;
     setMode('host');
     socket.emit('create-room', (response: any) => {
+      console.log('[App] create-room response:', response);
       if (response.success) {
         setRoomCode(response.roomCode);
         setRoom(response.room);

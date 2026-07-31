@@ -36,11 +36,16 @@ export const HostScreen: React.FC<HostScreenProps> = ({ socket, room, roomCode }
   };
 
   const handleStartTime = (minutes: number) => {
+    console.log('[HostScreen] handleStartTime called, roomCode:', roomCode, 'minutes:', minutes);
     socket.emit('select-time', { roomCode, minutes });
   };
 
   const handleStartGame = () => {
+    console.log('[HostScreen] handleStartGame called, roomCode:', roomCode);
+    console.log('[HostScreen] socket exists:', !!socket, 'socket.id:', socket?.id);
+    console.log('[HostScreen] room exists:', !!room, 'room.gameState:', room?.gameState);
     socket.emit('start-game', { roomCode });
+    console.log('[HostScreen] start-game event emitted');
   };
 
   const handlePlayAgain = () => {
