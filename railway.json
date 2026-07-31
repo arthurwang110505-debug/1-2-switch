@@ -1,0 +1,9 @@
+{
+  "deploy": {
+    "buildCommand": "npm install && npm run build",
+    "startCommand": "npm start",
+    "healthcheckPath": "/socket.io/?EIO=4&transport=polling",
+    "healthcheckTimeout": 100,
+    "env": "node"
+  }
+}
