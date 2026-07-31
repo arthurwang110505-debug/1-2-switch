@@ -1,8 +1,14 @@
 {
   "deploy": {
     "buildCommand": "npm install && npm run build",
-    "startCommand": "node dist/server.cjs",
+    "startCommand": "NODE_ENV=production node dist/server.cjs",
     "healthcheckPath": "/",
-    "healthcheckTimeout": 100
+    "healthcheckTimeout": 100,
+    "env": [
+      {
+        "key": "NODE_ENV",
+        "value": "production"
+      }
+    ]
   }
 }
