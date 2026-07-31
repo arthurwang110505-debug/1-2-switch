@@ -123,8 +123,15 @@ export function setupSocketHandlers(io: Server): void {
 
     // 4. Start game
     socket.on('start-game', ({ roomCode }) => {
+      console.log(`[Server] start-game event received, roomCode: ${roomCode}, socket.id: ${socket.id}`);
       const room = getRoom(roomCode);
-      if (!room) return;
+      if (!room) {
+        console.log(`[Server] Room ${roomCode} not found!`);
+        return;
+      }
+
+      console.log(`[Server] Found room ${roomCode}, gameState: ${room.gameState}, players: ${Object.keys(room.players).length}`);
+      console.log(`[Server] playlist length: ${room.playlist?.length}, currentGameIndex: ${room.currentGameIndex}`);
 
       room.currentGameIndex = 0;
       Object.values(room.players).forEach((p) => {
@@ -132,7 +139,9 @@ export function setupSocketHandlers(io: Server): void {
         p.roundScore = 0;
       });
 
+      console.log(`[Server] Calling startNextGameInPlaylist...`);
       startNextGameInPlaylist(roomCode);
+      console.log(`[Server] startNextGameInPlaylist completed`);
     });
 
     // 5. Reset to lobby

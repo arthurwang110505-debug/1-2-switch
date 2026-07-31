@@ -16,19 +16,31 @@ const io = globalThis.io as Server;
  */
 export function startNextGameInPlaylist(roomCode: string): void {
   const room = getRoom(roomCode);
-  if (!room) return;
+  if (!room) {
+    console.log(`[Scheduler] Room ${roomCode} not found in startNextGameInPlaylist`);
+    return;
+  }
+
+  console.log(`[Scheduler] startNextGameInPlaylist called for ${roomCode}`);
+  console.log(`[Scheduler] gameType: ${room.gameType}, gameState: ${room.gameState}`);
 
   clearRoomInterval(roomCode);
 
   // Check if all games are done
   if (room.currentGameIndex >= room.playlist.length) {
+    console.log(`[Scheduler] All games done, moving to leaderboard`);
     room.gameState = 'leaderboard';
     io.to(roomCode).emit('game-state-update', room);
     return;
   }
 
   const currentGame = room.playlist[room.currentGameIndex];
-  if (!currentGame) return;
+  if (!currentGame) {
+    console.log(`[Scheduler] No current game at index ${room.currentGameIndex}`);
+    return;
+  }
+
+  console.log(`[Scheduler] Starting game: ${currentGame.name} (${currentGame.gameType})`);
 
   // 1. Practice phase (30 seconds)
   room.gameState = 'practice';
@@ -38,6 +50,7 @@ export function startNextGameInPlaylist(roomCode: string): void {
 
   resetRoundScores(room);
   io.to(roomCode).emit('game-state-update', room);
+  console.log(`[Scheduler] Emitted game-state-update to ${roomCode}, gameState: ${room.gameState}`);
 
   let practiceTimer = 30;
   const interval = setInterval(() => {
