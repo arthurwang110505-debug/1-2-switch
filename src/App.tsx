@@ -29,13 +29,14 @@ function AppContent() {
     const socketUrl = import.meta.env.VITE_SOCKET_URL || window.location.origin;
 
     const newSocket = io(socketUrl, {
-      transports: ['polling', 'websocket'],
+      transports: ['polling'],
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       randomizationFactor: 0.5,
-      timeout: 20000
+      timeout: 20000,
+      withCredentials: false
     });
 
     newSocket.on('connect', () => {
