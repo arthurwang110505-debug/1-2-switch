@@ -35,7 +35,7 @@ function AppContent() {
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       randomizationFactor: 0.5,
-      timeout: 20000,
+      timeout: 60000,
       withCredentials: false
     });
 

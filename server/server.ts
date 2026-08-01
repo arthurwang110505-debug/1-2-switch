@@ -18,8 +18,8 @@ const io = new Server(server, {
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS']
   },
-  pingInterval: 10000,
-  pingTimeout: 20000,
+  pingInterval: 25000,
+  pingTimeout: 60000,
   maxHttpBufferSize: 1e7
 });
 

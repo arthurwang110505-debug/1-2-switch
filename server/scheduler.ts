@@ -3,18 +3,25 @@
  * Handles: practice → countdown → playing → result → next game → leaderboard
  */
 
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { Room, GameState } from '../src/types.js';
 import {
-  getRoom, getRooms, getRoomIntervals, clearRoomInterval, resetRoundScores
+  getRoom, getRoomIntervals, clearRoomInterval, resetRoundScores
 } from './rooms.js';
 
-const io = globalThis.io as Server;
+function getIo(): Server | undefined {
+  return (globalThis as any).io as Server | undefined;
+}
 
 /**
  * Start the next game in the playlist
  */
 export function startNextGameInPlaylist(roomCode: string): void {
+  const io = getIo();
+  if (!io) {
+    console.log(`[Scheduler] Socket.io instance is not initialized for ${roomCode}`);
+    return;
+  }
   const room = getRoom(roomCode);
   if (!room) {
     console.log(`[Scheduler] Room ${roomCode} not found in startNextGameInPlaylist`);
@@ -22,7 +29,7 @@ export function startNextGameInPlaylist(roomCode: string): void {
   }
 
   console.log(`[Scheduler] startNextGameInPlaylist called for ${roomCode}`);
-  console.log(`[Scheduler] gameType: ${room.gameType}, gameState: ${room.gameState}`);
+  console.log(`[Scheduler] gameState: ${room.gameState}, currentGameIndex: ${room.currentGameIndex}`);
 
   clearRoomInterval(roomCode);
 
@@ -40,7 +47,7 @@ export function startNextGameInPlaylist(roomCode: string): void {
     return;
   }
 
-  console.log(`[Scheduler] Starting game: ${currentGame.name} (${currentGame.gameType})`);
+  console.log(`[Scheduler] Starting game: ${currentGame.name} (${currentGame.mechanicType})`);
 
   // 1. Practice phase (30 seconds)
   room.gameState = 'practice';
@@ -84,6 +91,12 @@ function runCountdownPhase(roomCode: string): void {
   const currentGame = room.playlist[room.currentGameIndex];
   if (!currentGame) return;
 
+  const io = getIo();
+  if (!io) {
+    console.log(`[Scheduler] Socket.io instance is not available for countdown phase ${roomCode}`);
+    return;
+  }
+
   room.gameState = 'countdown';
   room.timerSeconds = 3;
   room.signalActive = false;
@@ -118,6 +131,12 @@ function runCountdownPhase(roomCode: string): void {
 function runPlayingPhase(roomCode: string, game: { estimatedSeconds: number; mechanicType: string }): void {
   const room = getRoom(roomCode);
   if (!room) return;
+
+  const io = getIo();
+  if (!io) {
+    console.log(`[Scheduler] Socket.io instance is not available for playing phase ${roomCode}`);
+    return;
+  }
 
   room.gameState = 'playing';
   room.timerSeconds = game.estimatedSeconds;
@@ -163,6 +182,12 @@ function runPlayingPhase(roomCode: string, game: { estimatedSeconds: number; mec
  * Round result phase — show scores for 5 seconds, then next game
  */
 function runGameResultPhase(roomCode: string): void {
+  const io = getIo();
+  if (!io) {
+    console.log(`[Scheduler] Socket.io instance is not available for game result phase ${roomCode}`);
+    return;
+  }
+
   const room = getRoom(roomCode);
   if (!room) return;
 
@@ -218,5 +243,8 @@ export function resetToLobby(roomCode: string): void {
     p.isEliminated = false;
   });
 
-  io.to(roomCode).emit('game-state-update', room);
+  const io = getIo();
+  if (io) {
+    io.to(roomCode).emit('game-state-update', room);
+  }
 }

@@ -20,6 +20,15 @@ export function setupSocketHandlers(io: Server): void {
       socket.compress(true).emit('heartbeat-ack', { timestamp: Date.now() });
     });
 
+    // Send periodic heartbeat every 10 seconds
+    const heartbeatInterval = setInterval(() => {
+      socket.compress(true).emit('heartbeat-ack', { timestamp: Date.now() });
+    }, 10000);
+
+    socket.on('disconnect', () => {
+      clearInterval(heartbeatInterval);
+    });
+
     // 1. Host creates room
     socket.on('create-room', (callback) => {
       const { code, room } = createRoom(socket.id);
