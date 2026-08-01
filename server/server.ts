@@ -16,8 +16,11 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: '*',
-    methods: ['GET', 'POST']
-  }
+    methods: ['GET', 'POST', 'OPTIONS']
+  },
+  pingInterval: 10000,
+  pingTimeout: 20000,
+  maxHttpBufferSize: 1e7
 });
 
 const PORT = process.env.PORT || 3000;

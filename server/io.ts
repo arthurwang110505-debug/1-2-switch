@@ -127,11 +127,13 @@ export function setupSocketHandlers(io: Server): void {
       const room = getRoom(roomCode);
       if (!room) {
         console.log(`[Server] Room ${roomCode} not found!`);
+        socket.emit('error', { message: 'Room not found' });
         return;
       }
 
       console.log(`[Server] Found room ${roomCode}, gameState: ${room.gameState}, players: ${Object.keys(room.players).length}`);
       console.log(`[Server] playlist length: ${room.playlist?.length}, currentGameIndex: ${room.currentGameIndex}`);
+      console.log(`[Server] Room code from URL: ${roomCode}, Room code from state: ${room.code}`);
 
       room.currentGameIndex = 0;
       Object.values(room.players).forEach((p) => {
